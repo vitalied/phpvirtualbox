@@ -1,18 +1,17 @@
 # Develop phpvirtualbox in docker
-#
-# 1) Get virtualbox host-only interface IP used by docker machine:
-#    docker-machine inspect default -f '{{.Driver.HostOnlyCIDR}}' | sed -e 's#/.*##'
-# 2) Start vboxwebsrv on the IP returned from the above command: 
-#    vboxwebsrv -H 192.168.99.1 # or edit vboxwebsrv startup config
-# 3) Edit config.php to use the IP
-# 4) docker-compose up
-# 5) Get docker machine ip:
-#    docker-machine ip default
-# 6) phpVirtualBox should be available at http://<ip returned from above command>
-#
-phpvirtualbox:
+
+# ufw allow proto tcp from 172.17.0.0/24 to 172.17.0.1 port 18083 comment 'vboxweb'
+
+phpvbox:
   build: .
+  restart: always
   ports:
-    - "80:80"
+    - 18888:80
   volumes:
     - .:/var/www/html
+
+phpvbox_monitoring:
+  image: nginx:alpine
+  restart: always
+  ports:
+    - 18889:80
